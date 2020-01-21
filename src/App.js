@@ -1,26 +1,44 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {Component} from 'react';
 import './App.css';
+import Person from './Components/Person'
+import axios from 'axios'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  constructor(){
+    super()
+    this.state = {
+      people: []
+    }
+  }
+
+  componentDidMount(){
+    axios.get('/api/people')
+      .then(res => this.setState({people: res.data}))
+      .catch(err => console.log(err))
+  }
+
+  editPerson = (id, first, last) => {
+    // console.log("id", id)
+    // console.log("first", first)
+    // console.log("last", last)
+    axios.put(`/api/people/${id}`, {firstName: first, lastName: last})
+      .then(res => {
+        // console.log("res.data", res.data)
+        this.setState({people: res.data})
+      })
+      .catch(err => console.log(err))
+  }
+  
+  render(){
+    // console.log("this.state.people", this.state.people)
+    return (
+      <div className="App">
+        {this.state.people.map(element => {
+          return <Person key={element.id} personInfo={element} editPerson={this.editPerson}/>
+        })}
+      </div>
+    );
+  }
 }
 
 export default App;
